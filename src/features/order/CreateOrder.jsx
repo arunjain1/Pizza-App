@@ -9,9 +9,9 @@ import {
 import { createOrder } from "../../services/apiRestaurant";
 import Button from "../../ui/button";
 import { useSelector } from "react-redux";
-import { getCart } from "../cart/cartSlice";
+import { clearCart, getCart } from "../cart/cartSlice";
 import EmptyCart from "../cart/EmptyCart";
-
+import store from "../../store"
 // https://uibakery.io/regex-library/phone-number
 const isValidPhone = (str) =>
   /^\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/.test(
@@ -43,7 +43,7 @@ const isValidPhone = (str) =>
 // ];
 
 function CreateOrder() {
-  // const [withPriority, setWithPriority] = useState(false);
+  const [withPriority, setWithPriority] = useState(false);
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
   const username = useSelector((state)=>state.user.username);
@@ -91,8 +91,8 @@ function CreateOrder() {
             type="checkbox"
             name="priority"
             id="priority"
-            // value={withPriority}
-            // onChange={(e) => setWithPriority(e.target.checked)}
+            value={withPriority}
+            onChange={(e) => setWithPriority(e.target.checked)}
           />
           <label htmlFor="priority">Want to yo give your order priority?</label>
         </div>
@@ -117,7 +117,7 @@ export async function action({ request }) {
   const order = {
     ...data,
     cart: JSON.parse(data.cart),
-    priority: data.priority === "on",
+    priority: data.priority === "true",
   };
   console.log(order);
 
@@ -131,6 +131,10 @@ export async function action({ request }) {
     return errors;
   }
   const newOrder = await createOrder(order);
+
+  //Do not Overuse
+  store.dispatch(clearCart());
+
   return redirect(`/order/${newOrder.id}`);
 }
 
