@@ -38,6 +38,7 @@ export async function createOrder(newOrder) {
 
 export async function updateOrder(id, updateObj) {
   try {
+    console.log(id,updateObj)
     const res = await fetch(`${API_URL}/order/${id}`, {
       method: "PATCH",
       body: JSON.stringify(updateObj),
